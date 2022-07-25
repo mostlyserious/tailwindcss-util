@@ -1,0 +1,12 @@
+{
+    "name": "@mostlyserious/tailwindcss-util",
+    "version": "1.0.0",
+    "description": "Plugins and utilities for TailwindCSS.",
+    "main": "index.js",
+    "repository": "git@github.com:mostlyserious/tailwindcss-util.git",
+    "author": "Cornelius Ukena <cornelius@mostlyserious.io>",
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    }
+}
