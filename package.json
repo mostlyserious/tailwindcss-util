@@ -1,11 +1,14 @@
 {
     "name": "@mostlyserious/tailwindcss-util",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Plugins and utilities for TailwindCSS.",
     "main": "index.js",
-    "repository": "git@github.com:mostlyserious/tailwindcss-util.git",
-    "author": "Cornelius Ukena <cornelius@mostlyserious.io>",
+    "repository": "mostlyserious/tailwindcss-util",
     "license": "MIT",
+    "author": {
+        "name": "Cornelius Ukena",
+        "email": "cornelius@mostlyserious.io"
+    },
     "publishConfig": {
         "access": "public"
     }

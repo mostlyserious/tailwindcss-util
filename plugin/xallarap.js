@@ -40,6 +40,7 @@ module.exports = plugin(({ matchUtilities, addComponents, addUtilities, addBase,
             '--parallax-z': value
         })
     }, {
-        values: theme('width')
+        values: theme('translate'),
+        supportsNegativeValues: true
     });
 });
