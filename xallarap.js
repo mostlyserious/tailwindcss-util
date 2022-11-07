@@ -1,49 +1,77 @@
 export default els => {
     const active = {};
+    const scopes = {};
 
-    let top, middle;
-
-    addEventListener('scroll', () => requestAnimationFrame(() => {
-        Object.values(active).forEach(el => {
-            top = el.getBoundingClientRect().top + pageYOffset;
-            middle = top + (el.offsetHeight / 2);
-
-            el.style.setProperty('--parallax-control',
-                parseFloat((pageYOffset + (innerHeight / 2) - middle) / (el.offsetHeight + innerHeight)).toFixed(4)
-            );
-        });
-    }));
+    let interval,
+        done = false;
 
     Array.from(els).forEach(el => {
-        el.dataset.id = random(7);
+        el.dataset.pxid = random(7);
 
-        isVisible(el, entry => (active[el.dataset.id] = el), {
+        if (el.dataset.parallax.length) {
+            scopes[el.dataset.parallax] = document.querySelector(el.dataset.parallax);
+        }
+
+        isVisible(el, entry => (active[el.dataset.pxid] = el), {
             threshold: 0
         });
 
-        isVisible(el, entry => (delete active[el.dataset.id]), {
+        isVisible(el, entry => (delete active[el.dataset.pxid]), {
             rootMargin: `${el.offsetHeight + 100}px 0px -100% 0px`,
             threshold: 1
         });
 
-        isVisible(el, entry => (delete active[el.dataset.id]), {
+        isVisible(el, entry => (delete active[el.dataset.pxid]), {
             rootMargin: `-100% 0px ${el.offsetHeight + 100}px 0px`,
             threshold: 1
         });
     });
+
+    listen(null, active);
+    Object.keys(scopes).forEach(key => listen(scopes[key], active));
+
+    interval = setInterval(() => {
+        if (!done) {
+            return Object.values(active).forEach(el => {
+                if (!el.style.getPropertyValue('--parallax-control')) {
+                    updateParallaxControl(el, scopes[el.dataset.parallax]
+                        ? scopes[el.dataset.parallax]
+                        : window.pageYOffset);
+
+                    return;
+                }
+
+                done = true;
+            });
+        }
+
+        clearInterval(interval);
+    }, 50);
 };
+
+function listen(scope, active) {
+    (scope || window).addEventListener('scroll', () => requestAnimationFrame(() => {
+        Object.values(active).forEach(el => {
+            if (scope && el.dataset.parallax.length) {
+                updateParallaxControl(el, scope.scrollTop);
+            } else if (!scope && !el.dataset.parallax.length) {
+                updateParallaxControl(el, window.pageYOffset);
+            }
+        });
+    }));
+}
+
+function updateParallaxControl(el, scroll) {
+    el.style.setProperty('--parallax-control',
+        parseFloat((scroll + (innerHeight / 2) - (el.getBoundingClientRect().top + scroll + (el.offsetHeight / 2))) / (el.offsetHeight + innerHeight)).toFixed(4)
+    );
+}
 
 function isVisible(el, handler, args = {}) {
     if (window.IntersectionObserver) {
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    handler(entry);
-                }
-            });
-        }, args);
-
-        observer.observe(el);
+        new IntersectionObserver(entries => {
+            entries.forEach(entry => entry.isIntersecting && handler(entry));
+        }, args).observe(el);
     } else {
         handler(null);
     }
